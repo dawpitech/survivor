@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: JEB_data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d JEB_data" ]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+  migrate:
+    build:
+      context: backend/API
+      target: builder
+    command: "go run migrate/migrate.go"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GIN_MODE: ${MODE}
+      DB_URL: "host=db user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=JEB_data port=5432 sslmode=disable"
+    restart: "no"
+
+  api:
+    build:
+      context: backend/API
+      target: release
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "80:24680"
+    environment:
+      GIN_MODE: ${MODE}
+      JWT_MASTER_SECRET: ${JWT_MASTER_SECRET}
+      DB_URL: "host=db user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=JEB_data port=5432 sslmode=disable"
