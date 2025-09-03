@@ -23,7 +23,9 @@ jobs:
           known_hosts: $SSH_PUB_KEY
 
       - name: Test SSH
-        run: ssh -T git@github.com | echo "Done"
+        run: |
+          git config --global url."git@github.com:".insteadOf "https://github.com/"
+          ssh -T git@github.com | echo "Done"
 
       - name: Checkout Main Repository
         uses: actions/checkout@v3
