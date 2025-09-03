@@ -7,3 +7,6 @@
 [submodule "frontend"]
 	path = frontend
 	url = git@github.com:dawpitech/survivorFRONT.git
+[submodule "backend"]
+	path = backend
+	url = git@github.com:dawpitech/survivorBACK.git
