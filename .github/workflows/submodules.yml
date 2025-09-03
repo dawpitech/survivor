@@ -16,21 +16,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: $SSH_PUB_KEY
-
-      - name: Test SSH
-        run: |
-          git config --global url."git@github.com:".insteadOf "https://github.com/"
-          ssh -T git@github.com | echo "Done"
-
       - name: Checkout Main Repository
         uses: actions/checkout@v3
         with:
           submodules: 'recursive'
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          persist-credentials: 'true'
 
       - name: Configure git
         run: |
