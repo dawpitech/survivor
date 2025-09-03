@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:16
+    profiles: [db]
     ports:
       - "5432:5432"
     environment:
@@ -15,6 +16,7 @@ services:
       timeout: 10s
 
   migrate:
+    profiles: [backend]
     build:
       context: backend/API
       target: builder
@@ -28,6 +30,7 @@ services:
     restart: "no"
 
   api:
+    profiles: [backend]
     build:
       context: backend/API
       target: release
