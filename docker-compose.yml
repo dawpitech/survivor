@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:16
-    profiles: [db]
+    profiles: [db, backend]
     ports:
       - "5432:5432"
     environment:
@@ -38,10 +38,18 @@ services:
       migrate:
         condition: service_completed_successfully
     ports:
-      - "80:24680"
+      - "24680:24680"
     environment:
       API_URL: ${API_URL}
       API_KEY: ${API_KEY}
       GIN_MODE: ${MODE}
       JWT_MASTER_SECRET: ${JWT_MASTER_SECRET}
       DB_URL: "host=db user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=JEB_data port=5432 sslmode=disable"
+
+  frontend:
+    profiles: [frontend]
+    build:
+      context: frontend
+      target: runner
+    ports:
+      - "80:3000"
