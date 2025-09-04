@@ -63,12 +63,9 @@ jobs:
       - name: Remove submodules
         run: |
           rm .gitmodules
-          rm -rf backend/API/.git*
-          rm -rf backend/worker/.git*
+          rm -rf backend/.git*
           rm -rf frontend/.git*
-          git rm --cached backend/API
-          git add .
-          git rm --cached backend/worker
+          git rm --cached backend
           git add .
           git rm --cached frontend
           git add .
