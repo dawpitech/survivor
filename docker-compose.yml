@@ -18,7 +18,7 @@ services:
   migrate:
     profiles: [backend]
     build:
-      context: backend/API
+      context: backend
       target: builder
     command: "go run migrate/migrate.go"
     depends_on:
@@ -32,7 +32,7 @@ services:
   api:
     profiles: [backend]
     build:
-      context: backend/API
+      context: backend
       target: release
     depends_on:
       migrate:
