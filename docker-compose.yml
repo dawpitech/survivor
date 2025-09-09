@@ -1,4 +1,18 @@
 services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--api.insecure=true"
+    ports:
+      - "80:80"
+      - "8081:8080" # Traefik dashboard (optional)
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    profiles: [frontend, backend]
+  
   db:
     image: postgres:16
     profiles: [db, backend]
@@ -37,28 +51,38 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
-    ports:
-      - "24680:24680"
     environment:
       API_URL: ${API_URL}
       API_KEY: ${API_KEY}
       GIN_MODE: ${MODE}
       JWT_MASTER_SECRET: ${JWT_MASTER_SECRET}
       DB_URL: "host=db user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=JEB_data port=5432 sslmode=disable"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=PathPrefix(`/api`) && !PathPrefix(`/api/docs`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.services.api.loadbalancer.server.port=24680"
 
   frontend:
     profiles: [frontend]
     build:
       context: frontend
       target: runner
-    ports:
-      - "80:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
 
   swagger:
-    profiles: [ backend ]
+    profiles: [backend]
     image: swaggerapi/swagger-ui
     depends_on: [ api ]
-    ports:
-      - "8080:8080"
     environment:
-      SWAGGER_JSON_URL: "http://localhost:24680/api/openapi.json"
+      SWAGGER_JSON_URL: "http://localhost/api/openapi.json"
+      BASE_URL: "/api/docs"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.swagger.rule=PathPrefix(`/api/docs`)"
+      - "traefik.http.routers.swagger.entrypoints=web"
+      - "traefik.http.services.swagger.loadbalancer.server.port=8080"
