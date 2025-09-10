@@ -8,7 +8,7 @@ services:
       - "--api.insecure=true"
     ports:
       - "80:80"
-      - "8081:8080" # Traefik dashboard (optional)
+      - "8080:8080" # Traefik dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     profiles: [frontend, backend]
@@ -59,7 +59,7 @@ services:
       DB_URL: "host=db user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=JEB_data port=5432 sslmode=disable"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=PathPrefix(`/api`) && !PathPrefix(`/api/docs`)"
+      - "traefik.http.routers.api.rule=PathPrefix(`/api`) && !PathPrefix(`/api/docs`) && !PathPrefix(`/api/dashboard`)"
       - "traefik.http.routers.api.entrypoints=web"
       - "traefik.http.services.api.loadbalancer.server.port=24680"
 
@@ -93,17 +93,21 @@ services:
     image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
     restart: unless-stopped
 
   grafana:
     profiles: [backend]
     depends_on: [prometheus]
     image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_SECURITY_ADMIN_USER=admin
+      - GF_SERVER_ROOT_URL=/api/dashboard
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=PathPrefix(`/api/dashboard`)"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.grafana-strip.stripprefix.prefixes=/api/dashboard"
+      - "traefik.http.routers.grafana.middlewares=grafana-strip"
