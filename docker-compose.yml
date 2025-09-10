@@ -86,3 +86,24 @@ services:
       - "traefik.http.routers.swagger.rule=PathPrefix(`/api/docs`)"
       - "traefik.http.routers.swagger.entrypoints=web"
       - "traefik.http.services.swagger.loadbalancer.server.port=8080"
+
+  prometheus:
+    profiles: [backend]
+    depends_on: [api]
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    profiles: [backend]
+    depends_on: [prometheus]
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    restart: unless-stopped
