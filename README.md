@@ -32,10 +32,10 @@ docker compose --profile backend up
 `<root>/api/docs` Swagger UI with the backend OpenAPI v3  
 `<root>/api/dashboard` Grafana dashboard to show metrics about the backend  
 
-### Development team
+## Development team
 
-This platform was developed by FranceDeveloppe
-Team composed of
+This platform was developed by FranceDeveloppe  
+A team composed of
 [@Dawoox](https://github.com/orgs/dawpitech/people/Dawoox),
 [@ALittlePatate](https://github.com/orgs/dawpitech/people/ALittlePatate),
 [@LucasLudovic](https://github.com/orgs/dawpitech/people/LucasLudovic) and
