@@ -23,3 +23,11 @@ The same thing applies if you want to work in real-time on the frontend, you can
 ```bash
 docker compose --profile backend up
 ```
+
+## URL(s)
+
+`<root>` Main platform access
+`<root>:8080` Proxy dashboard
+`<root>/api` Backend API
+`<root>/api/docs` Swagger UI with the backend OpenAPI v3
+`<root>/api/dashboard` Grafana dashboard to show metrics about the backend
