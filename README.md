@@ -35,4 +35,8 @@ docker compose --profile backend up
 ### Development team
 
 This platform was developed by FranceDeveloppe
-Team composed of @Dawoox, @ALittlePatate, @LucasLudovic and @TilioHuart 
+Team composed of
+[@Dawoox](https://github.com/orgs/dawpitech/people/Dawoox),
+[@ALittlePatate](https://github.com/orgs/dawpitech/people/ALittlePatate),
+[@LucasLudovic](https://github.com/orgs/dawpitech/people/LucasLudovic) and
+[@TilioHuart](https://github.com/orgs/dawpitech/people/TilioHuart)
